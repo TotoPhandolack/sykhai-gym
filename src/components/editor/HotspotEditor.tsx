@@ -45,6 +45,11 @@ function formatHotspot(h: Hotspot): string {
   return `{ ${parts.join(", ")} }`;
 }
 
+function makeId(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  return `hotspot-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 function generateExportCode(hotspotsByStop: HotspotOverrides): string {
   const lines = tourStops.map((stop) => {
     const hs = hotspotsByStop[stop.id] ?? [];
@@ -159,7 +164,7 @@ export default function HotspotEditor() {
       return;
     }
     const hotspot: Hotspot = {
-      id: draft.id ?? crypto.randomUUID(),
+      id: draft.id ?? makeId(),
       type: draft.type,
       yaw: draft.yaw,
       pitch: draft.pitch,
@@ -478,8 +483,11 @@ export default function HotspotEditor() {
                 <div className="flex gap-2 pt-1">
                   <button
                     onClick={saveHotspot}
-                    disabled={draft.type === "link" && !draft.targetStopId}
-                    className="flex-1 rounded-lg bg-brand py-2 text-xs font-semibold text-black transition-colors hover:bg-brand-dim disabled:cursor-not-allowed disabled:opacity-40"
+                    className={`flex-1 rounded-lg py-2 text-xs font-semibold text-black transition-colors ${
+                      draft.type === "link" && !draft.targetStopId
+                        ? "cursor-not-allowed bg-brand/40"
+                        : "bg-brand hover:bg-brand-dim"
+                    }`}
                   >
                     {draft.id ? "Save changes" : "Add hotspot"}
                   </button>

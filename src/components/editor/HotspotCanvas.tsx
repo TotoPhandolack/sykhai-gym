@@ -108,6 +108,7 @@ export default function HotspotCanvas({
         navbar: ["zoom"],
         plugins: [[MarkersPlugin, { clickEventOnMarker: true }]],
         loadingTxt: "",
+        defaultZoomLvl: 0,
       });
 
       markersRef.current = viewer.getPlugin<MarkersPlugin>(MarkersPlugin) ?? null;

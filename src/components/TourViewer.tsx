@@ -85,6 +85,7 @@ export default function TourViewer({
         navbar: ["zoom", "fullscreen"],
         plugins: [[MarkersPlugin, { clickEventOnMarker: true }]],
         loadingTxt: "",
+        defaultZoomLvl: 0,
       });
 
       const mp = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
