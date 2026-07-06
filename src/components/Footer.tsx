@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { MapPinIcon, ArrowRightIcon } from "./icons";
 import { MAPS_URL } from "@/data/business";
 
@@ -13,8 +14,17 @@ export default function Footer() {
     <footer className="border-t border-white/10 bg-black px-6 py-16">
       <div className="mx-auto grid max-w-6xl gap-12 sm:grid-cols-3">
         <div>
-          <a href="#hero" className="font-display text-2xl tracking-wide text-white">
-            SYKHAI <span className="text-brand">GYM</span>
+          <a href="#hero" className="flex items-center gap-2.5">
+            <Image
+              src="/logo.jpg"
+              alt="Sykhai Gym logo"
+              width={48}
+              height={48}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+            <span className="font-display text-2xl tracking-wide text-white">
+              SYKHAI <span className="text-brand">GYM</span>
+            </span>
           </a>
           <p className="mt-3 max-w-xs text-sm text-white/60">
             Vientiane&apos;s most affordable full-equipment gym. Train hard,

@@ -1,38 +1,37 @@
+import Image from "next/image";
 import type { TourStop } from "@/data/tour-stops";
-import { TourIcon } from "./icons";
 
 export default function TourStopThumb({
   stop,
   className = "",
   showLabel = true,
+  sizes = "400px",
 }: {
   stop: TourStop;
   className?: string;
   showLabel?: boolean;
+  sizes?: string;
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${stop.gradient} ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 ${className}`}
     >
-      <div
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
+      <Image
+        src={stop.image}
+        alt={stop.title}
+        fill
+        sizes={sizes}
+        className="object-cover"
       />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/10" />
       <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-brand">
-        360&deg; MOCKUP
+        360&deg; PHOTO
       </div>
-      <div className="flex h-full flex-col items-center justify-center gap-3 px-4 text-center text-white">
-        <TourIcon name={stop.icon} className="h-10 w-10 text-brand" />
-        {showLabel && (
-          <span className="font-display text-lg tracking-wide sm:text-xl">
-            {stop.title}
-          </span>
-        )}
-      </div>
+      {showLabel && (
+        <span className="absolute inset-x-0 bottom-0 p-4 font-display text-lg tracking-wide text-white sm:text-xl">
+          {stop.title}
+        </span>
+      )}
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import type { SVGProps } from "react";
-import type { TourStopIcon } from "@/data/tour-stops";
 
 export function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -152,73 +151,3 @@ export function GoogleGIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function TourIcon({
-  name,
-  ...props
-}: SVGProps<SVGSVGElement> & { name: TourStopIcon }) {
-  switch (name) {
-    case "weights":
-      return (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          {...props}
-        >
-          <path d="M4 9v6M6.5 7v10M17.5 7v10M20 9v6M9 12h6" />
-        </svg>
-      );
-    case "cardio":
-      return (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          {...props}
-        >
-          <path d="M3 12h3.5l1.8-5 3.4 10 2-7 1.3 2h5.5" />
-        </svg>
-      );
-    case "machine":
-      return (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          {...props}
-        >
-          <rect x="5" y="5" width="14" height="3.2" rx="0.6" />
-          <rect x="5" y="10.4" width="14" height="3.2" rx="0.6" />
-          <rect x="5" y="15.8" width="14" height="3.2" rx="0.6" />
-        </svg>
-      );
-    case "locker":
-      return (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          {...props}
-        >
-          <rect x="5" y="2.5" width="14" height="19" rx="1.2" />
-          <path d="M12 2.5v19" />
-          <circle cx="15.2" cy="12" r="0.9" fill="currentColor" stroke="none" />
-          <circle cx="8.8" cy="12" r="0.9" fill="currentColor" stroke="none" />
-        </svg>
-      );
-    default:
-      return null;
-  }
-}

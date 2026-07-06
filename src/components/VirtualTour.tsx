@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { tourStops } from "@/data/tour-stops";
+import TourViewer from "./TourViewer";
 import TourStopThumb from "./TourStopThumb";
 
 export default function VirtualTour() {
@@ -22,49 +23,49 @@ export default function VirtualTour() {
             Take the Virtual Tour
           </h2>
           <p className="mt-4 text-white/70">
-            A quick look around before you visit. Tap a stop to explore the
-            gym floor.
+            Real 360&deg; photos from inside the gym. Drag the photo below to
+            look around, and tap a stop to jump to a different spot on the
+            floor.
           </p>
         </div>
 
         <div className="mt-14">
-          <TourStopThumb
-            stop={active}
-            showLabel={false}
-            className="h-72 w-full sm:h-96"
+          <TourViewer
+            src={active.image}
+            alt={active.title}
+            hotspots={active.hotspots}
+            onNavigate={setActiveId}
+            className="h-72 w-full sm:h-[28rem]"
           />
 
-          <div className="mt-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex items-center justify-between gap-4">
             <h3 className="font-display text-2xl tracking-wide text-white">
               {active.title}
             </h3>
-            <span className="text-sm text-white/50">
+            <span className="shrink-0 text-sm text-white/50">
               Stop {tourStops.findIndex((s) => s.id === active.id) + 1} of{" "}
               {tourStops.length}
             </span>
           </div>
-          <p className="mt-2 max-w-2xl text-white/70">{active.description}</p>
 
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="mt-8 -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2">
             {tourStops.map((stop) => (
               <button
                 key={stop.id}
                 onClick={() => setActiveId(stop.id)}
-                className="text-left"
+                className="w-40 shrink-0 snap-start text-left sm:w-48"
                 aria-pressed={stop.id === activeId}
               >
                 <TourStopThumb
                   stop={stop}
-                  showLabel={false}
+                  showLabel
+                  sizes="200px"
                   className={`h-24 w-full transition sm:h-28 ${
                     stop.id === activeId
                       ? "ring-2 ring-brand"
                       : "opacity-70 hover:opacity-100"
                   }`}
                 />
-                <span className="mt-2 block truncate text-sm text-white/70">
-                  {stop.title}
-                </span>
               </button>
             ))}
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { MenuIcon, CloseIcon } from "./icons";
 
 const LINKS = [
@@ -44,9 +45,19 @@ export default function Nav() {
       <nav className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6 py-4">
         <button
           onClick={() => handleNavigate("hero")}
-          className="font-display text-2xl tracking-wide text-white"
+          className="flex items-center gap-2.5"
         >
-          SYKHAI <span className="text-brand">GYM</span>
+          <Image
+            src="/logo.jpg"
+            alt="Sykhai Gym logo"
+            width={44}
+            height={44}
+            className="h-11 w-11 rounded-full object-cover"
+            priority
+          />
+          <span className="font-display text-2xl tracking-wide text-white">
+            SYKHAI <span className="text-brand">GYM</span>
+          </span>
         </button>
 
         <ul className="hidden items-center gap-8 md:flex">
