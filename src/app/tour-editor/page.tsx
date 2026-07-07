@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import HotspotEditor from "@/components/editor/HotspotEditor";
+import HotspotEditor from "@/components/editor/HotspotEditorLoader";
 
 export const metadata: Metadata = {
   title: "Hotspot Editor",

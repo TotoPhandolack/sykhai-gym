@@ -53,6 +53,8 @@ export const tourStops: TourStop[] = [
   { id: "machine-circuit", title: "Machine Circuit", image: "/virtual/08.jpeg", hotspots: [
       { id: "3afe1135-582a-4bd4-9dd2-1bf43555d89a", type: "link", yaw: 3.3277, pitch: -0.3647, label: "Middle", icon: "ring", targetStopId: "weight-room" },
       { id: "db2fe625-4e11-4a38-941d-f276d35c49ec", type: "link", yaw: 4.8534, pitch: -0.3613, label: "Training rig", icon: "ring", targetStopId: "functional-rig" },
+      { id: "aa4f77cc-36ec-4510-84e2-90227e7b37fd", type: "link", yaw: 1.4092, pitch: -0.5244, label: "Front desk", icon: "ring", targetStopId: "front-desk" },
+      { id: "d0bdf9d2-6686-4af7-89ee-55f56aebce2f", type: "link", yaw: 0.1290, pitch: -0.1930, label: "Treadmill row", icon: "ring", targetStopId: "treadmill-row" },
     ] },
   { id: "weight-room", title: "Weight Room", image: "/virtual/09.jpeg", hotspots: [
       { id: "9a484230-f06c-4e2a-bf82-43b0f19c0fc0", type: "link", yaw: 3.9493, pitch: -0.5116, label: "Strength machine", icon: "ring", targetStopId: "strength-machines" },

@@ -18,3 +18,8 @@ export function saveHotspotOverrides(overrides: HotspotOverrides) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
 }
+
+export function clearHotspotOverrides() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(STORAGE_KEY);
+}

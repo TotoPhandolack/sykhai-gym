@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   tourStops,
   type Hotspot,
   type HotspotType,
 } from "@/data/tour-stops";
 import {
+  clearHotspotOverrides,
   loadHotspotOverrides,
   saveHotspotOverrides,
   type HotspotOverrides,
 } from "@/lib/hotspot-storage";
+import { generateTourStopsCode } from "@/lib/tour-stops-codegen";
 import HotspotCanvas, { type PlacingMode } from "./HotspotCanvas";
 import { HOTSPOT_ICONS } from "./hotspotIcons";
 
@@ -31,39 +34,19 @@ function baseHotspots(): HotspotOverrides {
   return base;
 }
 
-function formatHotspot(h: Hotspot): string {
-  const parts = [
-    `id: ${JSON.stringify(h.id)}`,
-    `type: ${JSON.stringify(h.type)}`,
-    `yaw: ${h.yaw.toFixed(4)}`,
-    `pitch: ${h.pitch.toFixed(4)}`,
-  ];
-  if (h.label) parts.push(`label: ${JSON.stringify(h.label)}`);
-  if (h.content) parts.push(`content: ${JSON.stringify(h.content)}`);
-  if (h.icon) parts.push(`icon: ${JSON.stringify(h.icon)}`);
-  if (h.targetStopId) parts.push(`targetStopId: ${JSON.stringify(h.targetStopId)}`);
-  return `{ ${parts.join(", ")} }`;
-}
-
 function makeId(): string {
   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
   return `hotspot-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-function generateExportCode(hotspotsByStop: HotspotOverrides): string {
-  const lines = tourStops.map((stop) => {
-    const hs = hotspotsByStop[stop.id] ?? [];
-    const hotspotsCode = hs.length
-      ? `[\n${hs.map((h) => `      ${formatHotspot(h)},`).join("\n")}\n    ]`
-      : "[]";
-    return `  { id: ${JSON.stringify(stop.id)}, title: ${JSON.stringify(stop.title)}, image: ${JSON.stringify(stop.image)}, hotspots: ${hotspotsCode} },`;
-  });
-  return `export const tourStops: TourStop[] = [\n${lines.join("\n")}\n];`;
-}
-
 export default function HotspotEditor() {
   const [hotspotsByStop, setHotspotsByStop] = useState<HotspotOverrides>(
-    baseHotspots,
+    () => {
+      const overrides = loadHotspotOverrides();
+      return Object.keys(overrides).length > 0
+        ? { ...baseHotspots(), ...overrides }
+        : baseHotspots();
+    },
   );
   const [selectedId, setSelectedId] = useState(tourStops[0].id);
   const [placing, setPlacing] = useState<PlacingMode>(null);
@@ -72,16 +55,15 @@ export default function HotspotEditor() {
   const [savedFlash, setSavedFlash] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [saveAllState, setSaveAllState] = useState<
+    "idle" | "saving" | "saved"
+  >("idle");
 
   // Local edits are drafted here; localStorage is only the editor's own
-  // staging area, not what the public site reads. Load any earlier session's
-  // overrides once we're safely past hydration.
-  useEffect(() => {
-    const overrides = loadHotspotOverrides();
-    if (Object.keys(overrides).length > 0) {
-      setHotspotsByStop((prev) => ({ ...prev, ...overrides }));
-    }
-  }, []);
+  // staging area, not what the public site reads. This component is
+  // client-only (see HotspotEditorLoader), so reading localStorage during
+  // the initial state computation above is safe — there's no SSR pass to
+  // mismatch against.
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -191,20 +173,46 @@ export default function HotspotEditor() {
   }
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(generateExportCode(hotspotsByStop));
+    await navigator.clipboard.writeText(generateTourStopsCode(hotspotsByStop));
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  }
+
+  async function saveAll() {
+    setSaveAllState("saving");
+    setError(null);
+    try {
+      const res = await fetch("/api/tour-hotspots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(hotspotsByStop),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        throw new Error(data?.error ?? `Save failed (${res.status}).`);
+      }
+      clearHotspotOverrides();
+      setSaveAllState("saved");
+      setTimeout(() => setSaveAllState("idle"), 1500);
+    } catch (e) {
+      setSaveAllState("idle");
+      setError(
+        e instanceof Error ? e.message : "Could not save hotspots to the file.",
+      );
+    }
   }
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-zinc-950 text-white">
       <header className="flex shrink-0 items-center gap-4 border-b border-white/10 px-5 py-3">
-        <a
+        <Link
           href="/"
           className="flex items-center gap-1.5 text-sm text-white/70 hover:text-white"
         >
           ← Back to site
-        </a>
+        </Link>
         <span className="text-white/30">·</span>
         <h1 className="font-display text-lg tracking-wide text-white">
           Hotspot Editor
@@ -212,12 +220,25 @@ export default function HotspotEditor() {
         {savedFlash && (
           <span className="text-xs font-medium text-green-400">Saved ✓</span>
         )}
-        <button
-          onClick={() => setExportOpen(true)}
-          className="ml-auto rounded-full bg-brand px-4 py-2 text-xs font-semibold text-black hover:bg-brand-dim"
-        >
-          Export code
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={() => setExportOpen(true)}
+            className="rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white/80 hover:bg-white/20"
+          >
+            Export code
+          </button>
+          <button
+            onClick={saveAll}
+            disabled={saveAllState === "saving"}
+            className="rounded-full bg-brand px-4 py-2 text-xs font-semibold text-black hover:bg-brand-dim disabled:cursor-wait disabled:opacity-60"
+          >
+            {saveAllState === "saving"
+              ? "Saving…"
+              : saveAllState === "saved"
+                ? "Saved ✓"
+                : "Save all"}
+          </button>
+        </div>
       </header>
 
       {error && (
@@ -569,7 +590,7 @@ export default function HotspotEditor() {
               these hotspots permanent.
             </p>
             <pre className="max-h-96 overflow-auto rounded-lg bg-black p-4 text-xs text-white/80">
-              <code>{generateExportCode(hotspotsByStop)}</code>
+              <code>{generateTourStopsCode(hotspotsByStop)}</code>
             </pre>
             <button
               onClick={handleCopy}
