@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { tourStops } from "@/data/tour-stops";
 import { clamp, bandOpacity } from "@/lib/utils";
@@ -9,13 +10,14 @@ import TourStopThumb from "./TourStopThumb";
 const TRACK_VH = 350;
 const firstStop = tourStops[0];
 
+const BarbellScene = dynamic(() => import("./BarbellScene"), { ssr: false });
+
 function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 }
 
 export default function Hero() {
   const trackRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [checkedMotionPref, setCheckedMotionPref] = useState(false);
@@ -32,7 +34,6 @@ export default function Hero() {
   useEffect(() => {
     if (!checkedMotionPref || reducedMotion) return;
     const track = trackRef.current;
-    const video = videoRef.current;
     if (!track) return;
 
     let rafId = 0;
@@ -43,12 +44,6 @@ export default function Hero() {
       const scrolledIntoTrack = -rect.top;
       const p = total > 0 ? clamp(scrolledIntoTrack / total, 0, 1) : 0;
       setProgress(p);
-      if (video && Number.isFinite(video.duration) && video.duration > 0) {
-        const target = p * video.duration;
-        if (Math.abs(video.currentTime - target) > 0.01) {
-          video.currentTime = target;
-        }
-      }
     };
     const onScroll = () => {
       if (!rafId) rafId = requestAnimationFrame(update);
@@ -109,25 +104,11 @@ export default function Hero() {
       className="relative bg-black"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          preload="auto"
-          poster="/videos/hero-poster.jpg"
-          disablePictureInPicture
-          className="absolute inset-0 h-full w-full object-cover"
-        >
-          <source src="/videos/hero-mockup.mp4" type="video/mp4" />
-        </video>
+        <div className="absolute inset-0 bg-black">
+          <BarbellScene className="h-full w-full" />
+        </div>
 
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-black/70" />
-
-        <div className="pointer-events-none absolute bottom-6 left-6 hidden sm:block">
-          <span className="rounded-full border border-white/15 bg-black/50 px-3 py-1 text-[10px] tracking-[0.2em] text-white/60">
-            MOCKUP PREVIEW &mdash; REAL FOOTAGE COMING SOON
-          </span>
-        </div>
 
         <div
           className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
@@ -165,7 +146,7 @@ export default function Hero() {
 
         <div
           aria-hidden={!showTeaser}
-          className={`absolute inset-0 flex items-center justify-center bg-black/85 backdrop-blur-sm transition-opacity duration-700 ${
+          className={`absolute inset-0 flex items-center justify-center bg-black backdrop-blur-sm transition-opacity duration-700 ${
             showTeaser ? "opacity-100" : "pointer-events-none opacity-0"
           }`}
         >
