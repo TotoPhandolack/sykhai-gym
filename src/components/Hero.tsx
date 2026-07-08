@@ -39,7 +39,9 @@ export default function Hero() {
       id="hero"
       className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-black py-24"
     >
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[720px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/20 blur-[100px]" />
+      <div
+        className={`pointer-events-none absolute left-1/2 top-1/2 h-[720px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/20 blur-[100px] ${animate ? "animate-glow-pulse" : ""}`}
+      />
 
       <div className="relative flex flex-col items-center gap-6 px-6 text-center">
         <div className={`h-72 w-72 sm:h-96 sm:w-96 ${logoIntroClass}`}>
