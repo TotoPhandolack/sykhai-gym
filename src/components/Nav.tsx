@@ -3,17 +3,20 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { MenuIcon, CloseIcon } from "./icons";
-
-const LINKS = [
-  { id: "pricing", label: "Pricing" },
-  { id: "virtual-tour", label: "Virtual Tour" },
-  { id: "location", label: "Location" },
-  { id: "reviews", label: "Reviews" },
-];
+import { useT } from "@/i18n/LanguageProvider";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Nav() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const links = [
+    { id: "pricing", label: t.nav.pricing },
+    { id: "virtual-tour", label: t.nav.virtualTour },
+    { id: "location", label: t.nav.location },
+    { id: "reviews", label: t.nav.reviews },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -61,7 +64,7 @@ export default function Nav() {
         </button>
 
         <ul className="hidden items-center gap-8 md:flex">
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <li key={link.id}>
               <button
                 onClick={() => handleNavigate(link.id)}
@@ -73,12 +76,15 @@ export default function Nav() {
           ))}
         </ul>
 
-        <button
-          onClick={() => handleNavigate("pricing")}
-          className="hidden rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-brand-dim md:inline-flex"
-        >
-          Get a Day Pass
-        </button>
+        <div className="hidden items-center gap-4 md:flex">
+          <LanguageSwitcher />
+          <button
+            onClick={() => handleNavigate("pricing")}
+            className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-brand-dim"
+          >
+            {t.nav.getDayPass}
+          </button>
+        </div>
 
         <button
           onClick={() => setOpen((v) => !v)}
@@ -92,7 +98,7 @@ export default function Nav() {
 
       {open && (
         <div className="flex flex-col items-center gap-8 border-t border-white/10 bg-black px-6 py-10 md:hidden">
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <button
               key={link.id}
               onClick={() => handleNavigate(link.id)}
@@ -105,8 +111,9 @@ export default function Nav() {
             onClick={() => handleNavigate("pricing")}
             className="mt-2 rounded-full bg-brand px-8 py-3 font-semibold text-black hover:bg-brand-dim"
           >
-            Get a Day Pass
+            {t.nav.getDayPass}
           </button>
+          <LanguageSwitcher variant="inline" />
         </div>
       )}
     </header>

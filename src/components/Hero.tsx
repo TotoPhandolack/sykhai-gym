@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ChevronDownIcon, ArrowRightIcon } from "./icons";
+import { useT } from "@/i18n/LanguageProvider";
 
 const LogoScene = dynamic(() => import("./LogoScene"), { ssr: false });
 
@@ -16,6 +17,7 @@ function delayStyle(animate: boolean, seconds: number) {
 }
 
 export default function Hero() {
+  const t = useT();
   const [reducedMotion, setReducedMotion] = useState(false);
   const [checkedMotionPref, setCheckedMotionPref] = useState(false);
 
@@ -68,21 +70,21 @@ export default function Hero() {
           className={`font-display text-3xl tracking-wide text-white sm:text-5xl ${introClass}`}
           style={delayStyle(animate, 0.3)}
         >
-          TRAIN HARD. <span className="text-brand">PAY LESS.</span>
+          {t.hero.taglineStrong}{" "}
+          <span className="text-brand">{t.hero.taglineAccent}</span>
         </h2>
         <p
           className={`max-w-md text-lg text-white/80 ${introClass}`}
           style={delayStyle(animate, 0.45)}
         >
-          Vientiane&apos;s most affordable full-equipment gym. Day passes from
-          ₭20,000.
+          {t.hero.subtitle}
         </p>
         <button
           onClick={goToTour}
           className={`inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 font-semibold text-black transition-colors hover:bg-brand-dim ${introClass}`}
           style={delayStyle(animate, 0.6)}
         >
-          Take the Virtual Tour
+          {t.hero.cta}
           <ArrowRightIcon className="h-4 w-4" />
         </button>
 
@@ -91,7 +93,7 @@ export default function Hero() {
           style={delayStyle(animate, 0.75)}
         >
           <span className="font-display text-sm tracking-[0.3em]">
-            SCROLL TO EXPLORE
+            {t.hero.scroll}
           </span>
           <ChevronDownIcon className="h-6 w-6 animate-bounce" />
         </div>

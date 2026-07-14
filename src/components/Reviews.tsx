@@ -1,8 +1,12 @@
+"use client";
+
 import { reviews, featuredQuote, getInitials } from "@/data/reviews";
 import { GoogleGIcon, QuoteIcon, ArrowRightIcon } from "./icons";
 import { MAPS_URL } from "@/data/business";
+import { useT } from "@/i18n/LanguageProvider";
 
 export default function Reviews() {
+  const t = useT();
   return (
     <section id="reviews" className="scroll-mt-20 bg-zinc-950 px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-6xl">
@@ -10,11 +14,11 @@ export default function Reviews() {
           <div className="flex items-center justify-center gap-2 text-brand">
             <GoogleGIcon className="h-5 w-5" />
             <span className="font-display text-sm tracking-[0.3em]">
-              GOOGLE REVIEWS
+              {t.reviews.eyebrow}
             </span>
           </div>
           <h2 className="mt-3 font-display text-4xl tracking-wide text-white sm:text-5xl">
-            What Our Members Say
+            {t.reviews.heading}
           </h2>
         </div>
 
@@ -64,7 +68,7 @@ export default function Reviews() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm font-semibold text-brand hover:text-brand-dim"
           >
-            Read more reviews on Google Maps
+            {t.reviews.readMore}
             <ArrowRightIcon className="h-4 w-4" />
           </a>
         </div>

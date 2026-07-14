@@ -66,6 +66,22 @@ body {
   color: var(--foreground);
 }
 
+/*
+ * Lao language: pair Outfit (Latin) with Phetsarath (Lao script).
+ * Outfit is listed first so Latin glyphs (numbers, "SYKHAI GYM", prices)
+ * render in Outfit, while Lao glyphs fall through to Phetsarath.
+ */
+html[lang="lo"] body {
+  font-family: var(--font-outfit), var(--font-phetsarath), sans-serif;
+}
+
+/* The display headings use Bebas Neue, which has no Lao glyphs. */
+html[lang="lo"] .font-display {
+  font-family: var(--font-outfit), var(--font-phetsarath), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
 ::selection {
   background: var(--brand);
   color: var(--ink);

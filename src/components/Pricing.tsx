@@ -1,32 +1,27 @@
+"use client";
+
 import { plans, formatKip, perMonth, savingsPercent } from "@/data/pricing";
 import { CheckIcon } from "./icons";
-
-const INCLUDED = [
-  "Full free-weights floor",
-  "Cardio + strength machines",
-  "Open 6 days a week, 15:00–20:30",
-  "Locker room access",
-];
+import { useT } from "@/i18n/LanguageProvider";
+import { interpolate } from "@/i18n/translations";
 
 export default function Pricing() {
+  const t = useT();
   return (
     <section id="pricing" className="scroll-mt-20 bg-black px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-2xl text-center">
           <p className="font-display text-sm tracking-[0.3em] text-brand">
-            MEMBERSHIP
+            {t.pricing.eyebrow}
           </p>
           <h2 className="mt-3 font-display text-4xl tracking-wide text-white sm:text-5xl">
-            Simple, Honest Pricing
+            {t.pricing.heading}
           </h2>
-          <p className="mt-4 text-white/70">
-            One gym, full access. Pick a day pass with zero commitment, or
-            save more the longer you train with us.
-          </p>
+          <p className="mt-4 text-white/70">{t.pricing.subtitle}</p>
         </div>
 
         <ul className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-x-8 gap-y-3">
-          {INCLUDED.map((item) => (
+          {t.pricing.included.map((item) => (
             <li
               key={item}
               className="flex items-center gap-2 text-sm text-white/70"
@@ -41,6 +36,10 @@ export default function Pricing() {
           {plans.map((plan) => {
             const monthly = perMonth(plan);
             const savings = savingsPercent(plan);
+            const planText = t.pricing.plans[plan.id] ?? {
+              name: plan.name,
+              unit: plan.unit,
+            };
             return (
               <div
                 key={plan.id}
@@ -52,12 +51,12 @@ export default function Pricing() {
               >
                 {plan.highlight && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-1 text-xs font-semibold tracking-wide text-black">
-                    BEST VALUE
+                    {t.pricing.bestValue}
                   </span>
                 )}
 
                 <h3 className="font-display text-xl tracking-wide text-white">
-                  {plan.name}
+                  {planText.name}
                 </h3>
 
                 <div className="mt-4">
@@ -65,21 +64,25 @@ export default function Pricing() {
                     {formatKip(plan.price)}
                   </span>
                   <span className="ml-1 text-sm text-white/50">
-                    {plan.unit}
+                    {planText.unit}
                   </span>
                 </div>
 
                 <div className="mt-2 h-5 text-xs text-white/50">
-                  {monthly && <span>≈ {formatKip(monthly)} / month</span>}
+                  {monthly && (
+                    <span>
+                      ≈ {formatKip(monthly)} {t.pricing.perMonth}
+                    </span>
+                  )}
                 </div>
 
                 {savings ? (
                   <span className="mt-3 inline-block w-fit rounded-full bg-brand/10 px-2.5 py-1 text-xs font-semibold text-brand">
-                    Save {savings}% vs. monthly
+                    {interpolate(t.pricing.save, { percent: savings })}
                   </span>
                 ) : (
                   <span className="mt-3 inline-block w-fit rounded-full bg-white/5 px-2.5 py-1 text-xs font-semibold text-white/50">
-                    No commitment
+                    {t.pricing.noCommitment}
                   </span>
                 )}
 
@@ -91,7 +94,7 @@ export default function Pricing() {
                       : "bg-white/10 text-white hover:bg-white/20"
                   }`}
                 >
-                  Get Started
+                  {t.pricing.getStarted}
                 </a>
               </div>
             );
@@ -99,8 +102,7 @@ export default function Pricing() {
         </div>
 
         <p className="mt-8 text-center text-xs text-white/40">
-          Prices in Lao Kip (₭). Visit us in person to purchase or renew a
-          membership.
+          {t.pricing.footnote}
         </p>
       </div>
     </section>

@@ -1,8 +1,12 @@
+"use client";
+
 import HoursPanel from "./HoursPanel";
 import { MapPinIcon, ArrowRightIcon } from "./icons";
 import { MAPS_URL, MAPS_EMBED_URL } from "@/data/business";
+import { useT } from "@/i18n/LanguageProvider";
 
 export default function Location() {
+  const t = useT();
   return (
     <section id="location" className="scroll-mt-20 bg-black px-6 py-24 sm:py-32">
       <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:gap-16">
@@ -16,7 +20,7 @@ export default function Location() {
             className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-black transition-colors hover:bg-brand-dim"
           >
             <MapPinIcon className="h-4 w-4" />
-            Get Directions
+            {t.hours.getDirections}
             <ArrowRightIcon className="h-4 w-4" />
           </a>
         </div>

@@ -4,8 +4,11 @@ import { useState } from "react";
 import { tourStops } from "@/data/tour-stops";
 import TourViewer from "./TourViewer";
 import TourStopThumb from "./TourStopThumb";
+import { useT } from "@/i18n/LanguageProvider";
+import { interpolate } from "@/i18n/translations";
 
 export default function VirtualTour() {
+  const t = useT();
   const [activeId, setActiveId] = useState(tourStops[0].id);
   const active = tourStops.find((s) => s.id === activeId) ?? tourStops[0];
 
@@ -17,16 +20,12 @@ export default function VirtualTour() {
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-2xl text-center">
           <p className="font-display text-sm tracking-[0.3em] text-brand">
-            SEE IT FOR YOURSELF
+            {t.tour.eyebrow}
           </p>
           <h2 className="mt-3 font-display text-4xl tracking-wide text-white sm:text-5xl">
-            Take the Virtual Tour
+            {t.tour.heading}
           </h2>
-          <p className="mt-4 text-white/70">
-            Real 360&deg; photos from inside the gym. Drag the photo below to
-            look around, and tap a stop to jump to a different spot on the
-            floor.
-          </p>
+          <p className="mt-4 text-white/70">{t.tour.subtitle}</p>
         </div>
 
         <div className="mt-14">
@@ -45,8 +44,10 @@ export default function VirtualTour() {
               {active.title}
             </h3>
             <span className="shrink-0 text-sm text-white/50">
-              Stop {tourStops.findIndex((s) => s.id === active.id) + 1} of{" "}
-              {tourStops.length}
+              {interpolate(t.tour.stopOf, {
+                index: tourStops.findIndex((s) => s.id === active.id) + 1,
+                total: tourStops.length,
+              })}
             </span>
           </div>
 

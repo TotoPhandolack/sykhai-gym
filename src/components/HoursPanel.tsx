@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { weeklyHours, getOpenStatus } from "@/lib/hours";
 import { ClockIcon } from "./icons";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 export default function HoursPanel() {
+  const { lang, t } = useLanguage();
   const [status, setStatus] = useState<{
     openNow: boolean;
     today: string;
@@ -21,11 +23,13 @@ export default function HoursPanel() {
     <div>
       <div className="flex items-center gap-2 text-brand">
         <ClockIcon className="h-5 w-5" />
-        <span className="font-display text-sm tracking-[0.3em]">HOURS</span>
+        <span className="font-display text-sm tracking-[0.3em]">
+          {t.hours.eyebrow}
+        </span>
       </div>
 
       <h2 className="mt-3 font-display text-4xl tracking-wide text-white sm:text-5xl">
-        Find Us & Visit
+        {t.hours.heading}
       </h2>
 
       {status && (
@@ -41,7 +45,8 @@ export default function HoursPanel() {
               status.openNow ? "bg-brand" : "bg-white/40"
             }`}
           />
-          {status.openNow ? "Open now" : "Closed now"} · Vientiane time
+          {status.openNow ? t.hours.openNow : t.hours.closedNow} ·{" "}
+          {t.hours.timezone}
         </span>
       )}
 
@@ -60,15 +65,17 @@ export default function HoursPanel() {
                   isToday ? "font-semibold text-brand" : "text-white/80"
                 }`}
               >
-                {d.day}
-                <span className="ml-2 text-white/40">{d.thai}</span>
+                {t.hours.days[d.day] ?? d.day}
+                {lang !== "en" && (
+                  <span className="ml-2 text-white/40">{d.day}</span>
+                )}
               </span>
               <span
                 className={`text-sm ${
                   isToday ? "font-semibold text-brand" : "text-white/60"
                 }`}
               >
-                {d.open && d.close ? `${d.open}–${d.close}` : "Closed"}
+                {d.open && d.close ? `${d.open}–${d.close}` : t.hours.closed}
               </span>
             </li>
           );
