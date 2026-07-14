@@ -58,7 +58,7 @@ export default function Nav() {
             className="h-11 w-11 rounded-full object-cover"
             priority
           />
-          <span className="font-display text-2xl tracking-wide text-white">
+          <span className="font-display font-brand text-2xl tracking-wide text-white">
             SYKHAI <span className="text-brand">GYM</span>
           </span>
         </button>
@@ -86,14 +86,17 @@ export default function Nav() {
           </button>
         </div>
 
-        <button
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          className="inline-flex h-10 w-10 items-center justify-center text-white md:hidden"
-        >
-          {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageSwitcher />
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            className="inline-flex h-10 w-10 items-center justify-center text-white"
+          >
+            {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          </button>
+        </div>
       </nav>
 
       {open && (
@@ -113,7 +116,6 @@ export default function Nav() {
           >
             {t.nav.getDayPass}
           </button>
-          <LanguageSwitcher variant="inline" />
         </div>
       )}
     </header>

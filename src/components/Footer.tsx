@@ -25,7 +25,7 @@ export default function Footer() {
               height={48}
               className="h-12 w-12 rounded-full object-cover"
             />
-            <span className="font-display text-2xl tracking-wide text-white">
+            <span className="font-display font-brand text-2xl tracking-wide text-white">
               SYKHAI <span className="text-brand">GYM</span>
             </span>
           </a>

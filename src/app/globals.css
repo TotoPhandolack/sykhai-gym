@@ -76,10 +76,15 @@ html[lang="lo"] body {
 }
 
 /* The display headings use Bebas Neue, which has no Lao glyphs. */
-html[lang="lo"] .font-display {
+html[lang="lo"] .font-display:not(.font-brand) {
   font-family: var(--font-outfit), var(--font-phetsarath), sans-serif;
   font-weight: 700;
   letter-spacing: 0;
+}
+
+/* The "SYKHAI GYM" wordmark keeps Bebas Neue in every language — it's a logo, not body copy. */
+.font-brand {
+  font-family: var(--font-bebas-neue);
 }
 
 ::selection {

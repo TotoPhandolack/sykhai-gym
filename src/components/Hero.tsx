@@ -61,7 +61,7 @@ export default function Hero() {
           )}
         </div>
         <h1
-          className={`font-display text-6xl tracking-wide text-brand sm:text-8xl ${introClass}`}
+          className={`font-display font-brand text-6xl tracking-wide text-brand sm:text-8xl ${introClass}`}
           style={delayStyle(animate, 0.15)}
         >
           SYKHAI GYM
