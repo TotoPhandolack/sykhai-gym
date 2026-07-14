@@ -62,13 +62,18 @@ export default function TourViewer({
   const [transitioning, setTransitioning] = useState(false);
 
   const hotspotsRef = useRef(hotspots);
-  hotspotsRef.current = hotspots;
   const onNavigateRef = useRef(onNavigate);
-  onNavigateRef.current = onNavigate;
   const defaultYawRef = useRef(defaultYaw);
-  defaultYawRef.current = defaultYaw;
   const defaultPitchRef = useRef(defaultPitch);
-  defaultPitchRef.current = defaultPitch;
+
+  // Keep the "latest value" refs in sync after every render, rather than
+  // writing to them during render (which the React Compiler forbids).
+  useEffect(() => {
+    hotspotsRef.current = hotspots;
+    onNavigateRef.current = onNavigate;
+    defaultYawRef.current = defaultYaw;
+    defaultPitchRef.current = defaultPitch;
+  });
 
   // Initialize the viewer once on mount.
   useEffect(() => {
@@ -159,7 +164,6 @@ export default function TourViewer({
         mp?.setMarkers(buildMarkers(hotspotsRef.current));
         setTransitioning(false);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
   return (

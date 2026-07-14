@@ -97,15 +97,20 @@ function HotspotCanvas(
   const [ready, setReady] = useState(false);
 
   const placingRef = useRef(placing);
-  placingRef.current = placing;
   const onPlaceRef = useRef(onPlace);
-  onPlaceRef.current = onPlace;
   const onSelectHotspotRef = useRef(onSelectHotspot);
-  onSelectHotspotRef.current = onSelectHotspot;
   const defaultYawRef = useRef(defaultYaw);
-  defaultYawRef.current = defaultYaw;
   const defaultPitchRef = useRef(defaultPitch);
-  defaultPitchRef.current = defaultPitch;
+
+  // Keep the "latest value" refs in sync after every render, rather than
+  // writing to them during render (which the React Compiler forbids).
+  useEffect(() => {
+    placingRef.current = placing;
+    onPlaceRef.current = onPlace;
+    onSelectHotspotRef.current = onSelectHotspot;
+    defaultYawRef.current = defaultYaw;
+    defaultPitchRef.current = defaultPitch;
+  });
 
   useImperativeHandle(ref, () => ({
     getPosition() {
@@ -197,7 +202,6 @@ function HotspotCanvas(
         pitch: defaultPitchRef.current ?? 0,
       },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
   // Re-evaluate the cursor whenever placing mode toggles.
