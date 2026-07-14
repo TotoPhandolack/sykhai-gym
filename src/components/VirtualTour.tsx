@@ -34,6 +34,8 @@ export default function VirtualTour() {
             src={active.image}
             alt={active.title}
             hotspots={active.hotspots}
+            defaultYaw={active.defaultYaw}
+            defaultPitch={active.defaultPitch}
             onNavigate={setActiveId}
             className="h-72 w-full sm:h-[28rem]"
           />

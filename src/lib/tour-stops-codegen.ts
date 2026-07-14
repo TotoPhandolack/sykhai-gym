@@ -15,13 +15,24 @@ function formatHotspot(h: Hotspot): string {
   return `{ ${parts.join(", ")} }`;
 }
 
-export function generateTourStopsCode(hotspotsByStop: HotspotOverrides): string {
+export function generateTourStopsCode(overridesByStop: HotspotOverrides): string {
   const lines = tourStops.map((stop) => {
-    const hs = hotspotsByStop[stop.id] ?? [];
+    const override = overridesByStop[stop.id];
+    const hs = override?.hotspots ?? [];
+    const defaultYaw = override?.defaultYaw ?? stop.defaultYaw;
+    const defaultPitch = override?.defaultPitch ?? stop.defaultPitch;
     const hotspotsCode = hs.length
       ? `[\n${hs.map((h) => `      ${formatHotspot(h)},`).join("\n")}\n    ]`
       : "[]";
-    return `  { id: ${JSON.stringify(stop.id)}, title: ${JSON.stringify(stop.title)}, image: ${JSON.stringify(stop.image)}, hotspots: ${hotspotsCode} },`;
+    const parts = [
+      `id: ${JSON.stringify(stop.id)}`,
+      `title: ${JSON.stringify(stop.title)}`,
+      `image: ${JSON.stringify(stop.image)}`,
+    ];
+    if (defaultYaw !== undefined) parts.push(`defaultYaw: ${defaultYaw.toFixed(4)}`);
+    if (defaultPitch !== undefined) parts.push(`defaultPitch: ${defaultPitch.toFixed(4)}`);
+    parts.push(`hotspots: ${hotspotsCode}`);
+    return `  { ${parts.join(", ")} },`;
   });
   return `export const tourStops: TourStop[] = [\n${lines.join("\n")}\n];`;
 }

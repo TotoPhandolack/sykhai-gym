@@ -16,11 +16,14 @@ export type TourStop = {
   id: string;
   title: string;
   image: string;
+  /** Camera direction shown when a visitor first arrives at this scene. */
+  defaultYaw?: number;
+  defaultPitch?: number;
   hotspots: Hotspot[];
 };
 
 export const tourStops: TourStop[] = [
-  { id: "free-weights-wall", title: "Free Weights Wall", image: "/virtual/04.jpeg", hotspots: [
+  { id: "free-weights-wall", title: "Free Weights Wall", image: "/virtual/04.jpeg", defaultYaw: 3.4531, defaultPitch: -0.0969, hotspots: [
       { id: "f7a71739-0de6-4918-9c13-a8ad6b58720f", type: "link", yaw: 3.0825, pitch: -0.3106, label: "Training Rig", icon: "ring", targetStopId: "functional-rig" },
       { id: "ffe304fd-c2c8-442e-9e44-a5827c940447", type: "link", yaw: 4.1969, pitch: -0.6250, targetStopId: "dumbbell-bench" },
     ] },

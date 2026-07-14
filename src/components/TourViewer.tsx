@@ -16,6 +16,8 @@ interface Props {
   src: string;
   alt: string;
   hotspots?: Hotspot[];
+  defaultYaw?: number;
+  defaultPitch?: number;
   onNavigate?: (targetStopId: string) => void;
   className?: string;
 }
@@ -48,6 +50,8 @@ export default function TourViewer({
   src,
   alt,
   hotspots = [],
+  defaultYaw,
+  defaultPitch,
   onNavigate,
   className = "",
 }: Props) {
@@ -61,6 +65,10 @@ export default function TourViewer({
   hotspotsRef.current = hotspots;
   const onNavigateRef = useRef(onNavigate);
   onNavigateRef.current = onNavigate;
+  const defaultYawRef = useRef(defaultYaw);
+  defaultYawRef.current = defaultYaw;
+  const defaultPitchRef = useRef(defaultPitch);
+  defaultPitchRef.current = defaultPitch;
 
   // Initialize the viewer once on mount.
   useEffect(() => {
@@ -86,6 +94,8 @@ export default function TourViewer({
         plugins: [[MarkersPlugin, { clickEventOnMarker: true }]],
         loadingTxt: "",
         defaultZoomLvl: 0,
+        defaultYaw: defaultYawRef.current ?? 0,
+        defaultPitch: defaultPitchRef.current ?? 0,
       });
 
       const mp = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
@@ -136,11 +146,19 @@ export default function TourViewer({
 
     setTransitioning(true);
     mp?.clearMarkers();
-    void viewer.setPanorama(src, { transition: true }).then(() => {
-      if (!viewerRef.current) return;
-      mp?.setMarkers(buildMarkers(hotspotsRef.current));
-      setTransitioning(false);
-    });
+    void viewer
+      .setPanorama(src, {
+        transition: true,
+        position: {
+          yaw: defaultYawRef.current ?? 0,
+          pitch: defaultPitchRef.current ?? 0,
+        },
+      })
+      .then(() => {
+        if (!viewerRef.current) return;
+        mp?.setMarkers(buildMarkers(hotspotsRef.current));
+        setTransitioning(false);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 

@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
 import { tourStops, type Hotspot } from "@/data/tour-stops";
-import type { HotspotOverrides } from "@/lib/hotspot-storage";
+import type { HotspotOverrides, StopOverride } from "@/lib/hotspot-storage";
 import { generateTourStopsCode } from "@/lib/tour-stops-codegen";
 
 const DATA_FILE = path.join(process.cwd(), "src", "data", "tour-stops.ts");
@@ -20,14 +20,27 @@ function isHotspot(value: unknown): value is Hotspot {
   );
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isStopOverride(value: unknown): value is StopOverride {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  if (!Array.isArray(v.hotspots) || !v.hotspots.every(isHotspot)) return false;
+  if (v.defaultYaw !== undefined && !isFiniteNumber(v.defaultYaw)) return false;
+  if (v.defaultPitch !== undefined && !isFiniteNumber(v.defaultPitch)) return false;
+  return true;
+}
+
 function parseOverrides(body: unknown): HotspotOverrides | null {
   if (typeof body !== "object" || body === null || Array.isArray(body)) return null;
   const knownIds = new Set(tourStops.map((s) => s.id));
   const overrides: HotspotOverrides = {};
-  for (const [stopId, hotspots] of Object.entries(body)) {
+  for (const [stopId, stopOverride] of Object.entries(body)) {
     if (!knownIds.has(stopId)) return null;
-    if (!Array.isArray(hotspots) || !hotspots.every(isHotspot)) return null;
-    overrides[stopId] = hotspots;
+    if (!isStopOverride(stopOverride)) return null;
+    overrides[stopId] = stopOverride;
   }
   return overrides;
 }

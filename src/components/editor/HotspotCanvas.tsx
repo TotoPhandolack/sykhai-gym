@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type ForwardedRef,
+} from "react";
 import type { Viewer } from "@photo-sphere-viewer/core";
 import type {
   MarkerConfig,
@@ -22,9 +29,15 @@ interface Props {
   hotspots: Hotspot[];
   placing: PlacingMode;
   draftPosition: { yaw: number; pitch: number } | null;
+  defaultYaw?: number;
+  defaultPitch?: number;
   onPlace: (pos: { yaw: number; pitch: number }) => void;
   onSelectHotspot: (id: string) => void;
   className?: string;
+}
+
+export interface HotspotCanvasHandle {
+  getPosition(): { yaw: number; pitch: number } | null;
 }
 
 const DRAFT_MARKER_ID = "__draft__";
@@ -63,15 +76,20 @@ function draftMarker(pos: { yaw: number; pitch: number }): MarkerConfig {
   };
 }
 
-export default function HotspotCanvas({
-  src,
-  hotspots,
-  placing,
-  draftPosition,
-  onPlace,
-  onSelectHotspot,
-  className = "",
-}: Props) {
+function HotspotCanvas(
+  {
+    src,
+    hotspots,
+    placing,
+    draftPosition,
+    defaultYaw,
+    defaultPitch,
+    onPlace,
+    onSelectHotspot,
+    className = "",
+  }: Props,
+  ref: ForwardedRef<HotspotCanvasHandle>,
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Viewer | null>(null);
   const markersRef = useRef<MarkersPlugin | null>(null);
@@ -84,6 +102,16 @@ export default function HotspotCanvas({
   onPlaceRef.current = onPlace;
   const onSelectHotspotRef = useRef(onSelectHotspot);
   onSelectHotspotRef.current = onSelectHotspot;
+  const defaultYawRef = useRef(defaultYaw);
+  defaultYawRef.current = defaultYaw;
+  const defaultPitchRef = useRef(defaultPitch);
+  defaultPitchRef.current = defaultPitch;
+
+  useImperativeHandle(ref, () => ({
+    getPosition() {
+      return viewerRef.current?.getPosition() ?? null;
+    },
+  }));
 
   // Initialize the viewer once on mount.
   useEffect(() => {
@@ -109,6 +137,8 @@ export default function HotspotCanvas({
         plugins: [[MarkersPlugin, { clickEventOnMarker: true }]],
         loadingTxt: "",
         defaultZoomLvl: 0,
+        defaultYaw: defaultYawRef.current ?? 0,
+        defaultPitch: defaultPitchRef.current ?? 0,
       });
 
       markersRef.current = viewer.getPlugin<MarkersPlugin>(MarkersPlugin) ?? null;
@@ -155,11 +185,18 @@ export default function HotspotCanvas({
   }, []);
 
   // Swap the panorama when a different scene is selected (instant — no
-  // decorative fade needed while editing).
+  // decorative fade needed while editing). Reset to that scene's default
+  // view so the camera doesn't carry over the previous scene's angle.
   useEffect(() => {
     const viewer = viewerRef.current;
     if (!viewer) return;
-    void viewer.setPanorama(src, { transition: false });
+    void viewer.setPanorama(src, {
+      transition: false,
+      position: {
+        yaw: defaultYawRef.current ?? 0,
+        pitch: defaultPitchRef.current ?? 0,
+      },
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
@@ -183,3 +220,5 @@ export default function HotspotCanvas({
     </div>
   );
 }
+
+export default forwardRef(HotspotCanvas);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   tourStops,
@@ -14,7 +14,10 @@ import {
   type HotspotOverrides,
 } from "@/lib/hotspot-storage";
 import { generateTourStopsCode } from "@/lib/tour-stops-codegen";
-import HotspotCanvas, { type PlacingMode } from "./HotspotCanvas";
+import HotspotCanvas, {
+  type HotspotCanvasHandle,
+  type PlacingMode,
+} from "./HotspotCanvas";
 import { HOTSPOT_ICONS } from "./hotspotIcons";
 
 type HotspotDraft = {
@@ -30,7 +33,13 @@ type HotspotDraft = {
 
 function baseHotspots(): HotspotOverrides {
   const base: HotspotOverrides = {};
-  for (const stop of tourStops) base[stop.id] = stop.hotspots;
+  for (const stop of tourStops) {
+    base[stop.id] = {
+      hotspots: stop.hotspots,
+      defaultYaw: stop.defaultYaw,
+      defaultPitch: stop.defaultPitch,
+    };
+  }
   return base;
 }
 
@@ -76,8 +85,11 @@ export default function HotspotEditor() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  const canvasRef = useRef<HotspotCanvasHandle>(null);
+
   const selected = tourStops.find((s) => s.id === selectedId) ?? tourStops[0];
-  const hotspots = hotspotsByStop[selectedId] ?? [];
+  const selectedOverride = hotspotsByStop[selectedId];
+  const hotspots = selectedOverride?.hotspots ?? [];
   const otherStops = tourStops.filter((s) => s.id !== selectedId);
 
   function selectStop(id: string) {
@@ -156,20 +168,44 @@ export default function HotspotEditor() {
       icon: draft.icon || undefined,
       targetStopId: draft.type === "link" ? draft.targetStopId : undefined,
     };
-    const current = hotspotsByStop[selectedId] ?? [];
+    const current = hotspotsByStop[selectedId]?.hotspots ?? [];
     const next = draft.id
       ? current.map((h) => (h.id === hotspot.id ? hotspot : h))
       : [...current, hotspot];
-    persist({ ...hotspotsByStop, [selectedId]: next });
+    persist({
+      ...hotspotsByStop,
+      [selectedId]: { ...hotspotsByStop[selectedId], hotspots: next },
+    });
     setDraft(null);
     setError(null);
     flashSaved();
   }
 
   function deleteHotspot(id: string) {
-    const current = hotspotsByStop[selectedId] ?? [];
-    persist({ ...hotspotsByStop, [selectedId]: current.filter((h) => h.id !== id) });
+    const current = hotspotsByStop[selectedId]?.hotspots ?? [];
+    persist({
+      ...hotspotsByStop,
+      [selectedId]: {
+        ...hotspotsByStop[selectedId],
+        hotspots: current.filter((h) => h.id !== id),
+      },
+    });
     if (draft?.id === id) setDraft(null);
+  }
+
+  function setDefaultView() {
+    const pos = canvasRef.current?.getPosition();
+    if (!pos) return;
+    persist({
+      ...hotspotsByStop,
+      [selectedId]: {
+        ...hotspotsByStop[selectedId],
+        hotspots,
+        defaultYaw: pos.yaw,
+        defaultPitch: pos.pitch,
+      },
+    });
+    flashSaved();
   }
 
   async function handleCopy() {
@@ -258,7 +294,7 @@ export default function HotspotEditor() {
             </h2>
             <ul className="space-y-1.5">
               {tourStops.map((s) => {
-                const count = (hotspotsByStop[s.id] ?? []).length;
+                const count = (hotspotsByStop[s.id]?.hotspots ?? []).length;
                 return (
                   <li key={s.id}>
                     <button
@@ -293,10 +329,13 @@ export default function HotspotEditor() {
 
         <main className="relative min-w-0 flex-1 bg-black">
           <HotspotCanvas
+            ref={canvasRef}
             src={selected.image}
             hotspots={hotspots}
             placing={placing}
             draftPosition={draft ? { yaw: draft.yaw, pitch: draft.pitch } : null}
+            defaultYaw={selectedOverride?.defaultYaw}
+            defaultPitch={selectedOverride?.defaultPitch}
             onPlace={handlePlace}
             onSelectHotspot={editHotspot}
             className="absolute inset-0"
@@ -321,15 +360,24 @@ export default function HotspotEditor() {
                 Cancel placing
               </button>
             ) : (
-              <button
-                onClick={() => {
-                  setDraft(null);
-                  setPlacing("new");
-                }}
-                className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-black hover:bg-brand-dim"
-              >
-                + Add Hotspot
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    setDraft(null);
+                    setPlacing("new");
+                  }}
+                  className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-black hover:bg-brand-dim"
+                >
+                  + Add Hotspot
+                </button>
+                <button
+                  onClick={setDefaultView}
+                  title="Save the current camera angle as this scene's starting view"
+                  className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/20"
+                >
+                  Set as default view
+                </button>
+              </>
             )}
           </div>
         </main>

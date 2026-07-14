@@ -2,7 +2,13 @@ import type { Hotspot } from "@/data/tour-stops";
 
 const STORAGE_KEY = "sykhai-gym:tour-hotspots";
 
-export type HotspotOverrides = Record<string, Hotspot[]>;
+export type StopOverride = {
+  hotspots: Hotspot[];
+  defaultYaw?: number;
+  defaultPitch?: number;
+};
+
+export type HotspotOverrides = Record<string, StopOverride>;
 
 export function loadHotspotOverrides(): HotspotOverrides {
   if (typeof window === "undefined") return {};
